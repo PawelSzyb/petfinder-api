@@ -1,4 +1,6 @@
 import fetchJsonp from "fetch-jsonp";
+import { isValidZip } from "./validate";
+import { showError } from "./validate";
 
 const petForm = document.querySelector("#pet-form");
 
@@ -12,6 +14,12 @@ function fetchAnimals(e) {
 
   const animal = document.querySelector("#animal").value;
   const zip = document.querySelector("#zip").value;
+
+  // Validate Zip
+  if (!isValidZip(zip)) {
+    showError("Enter valid zipcode!", "danger");
+    return;
+  }
 
   // API request
   fetchJsonp(
@@ -34,13 +42,28 @@ function showPets(pets) {
     console.log(pet);
     results.innerHTML += `
       <div class="row">
-        <div class="col s6">
+        <div class="col s12 m6">
           <h4>${pet.name.$t} (${pet.age.$t})</h4>
           <p>${pet.breeds.breed.$t}</p>
-          <p></p>
+          <p>${pet.contact.address1.$t} ${pet.contact.city.$t} ${
+      pet.contact.state.$t
+    } ${pet.contact.zip.$t}</p>
+          <ul class="collection">
+            <li class="collection-item">Phone : ${pet.contact.phone.$t}</li>
+            ${
+              pet.contact.email.$t
+                ? `<li class="collection-item">Email : ${
+                    pet.contact.email.$t
+                  }</li>`
+                : ``
+            }
+            <li class="collection-item">Shelter ID: ${pet.shelterId.$t}</li>
+          </ul>
         </div>
-        <div class="col s6">
-
+        <div class="col s12 m6 center-align">
+            <img class="circle responsive-img" src="${
+              pet.media.photos.photo[3].$t
+            }"></img>
         </div>
       </div>
     `;
